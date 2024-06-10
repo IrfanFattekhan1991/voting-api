@@ -9,11 +9,11 @@ mongoose
   .catch((err) => console.Console.log("Error occured...", err));
 
 app.use(express.json());
-app.use("/api", userRoutes);
+app.use("/api/user", userRoutes);
 
 // // Add a test route
 // app.get("/", (req, res) => {
 //   res.send("Server is up and running!");
 // });
-
-app.listen(3000, () => console.log("Listening...."));
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Listening on port ${port}....`));
