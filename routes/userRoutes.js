@@ -1,3 +1,4 @@
+const auth = require("../middlewares/auth");
 const User = require("../models/user");
 const express = require("express");
 const router = express.Router();
@@ -50,6 +51,39 @@ router.post("/login", async (req, res) => {
   const token = user.generateAuthToken();
   //const token = jwt.sign({ _id: user._id }, process.env.JWT_PRIVATE_KEY);
   res.send(token);
+});
+
+router.get("/profile", auth, async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+  res.status(200).send(user);
+});
+
+router.put("/profile/password", auth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    const { currentPassword, newPassword } = req.body;
+
+    const isValidPassword = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isValidPassword)
+      return res.status(400).send("Password did not match!");
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).send("Password updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
 });
 
 module.exports = router;
