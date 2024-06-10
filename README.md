@@ -5,3 +5,4 @@
 - Created User & Candidate Model
 - created rout for signup user
 - created rout for signin user
+- created routes for profile and password update
